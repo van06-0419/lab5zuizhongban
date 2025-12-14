@@ -1,0 +1,65 @@
+name: Build Physics Simulator
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Configure CMake
+      run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: cmake --build build --config Release
+    
+    - name: Test build artifacts
+      run: |
+        dir build\Release\
+        if not exist build\Release\physics.exe (echo Binary not found! && exit 1)
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: physics-windows
+        path: build/Release/physics.exe
+        if-no-files-found: error
+
+  build-linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsfml-dev
+    
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+    
+    - name: Build
+      run: cmake --build build --config Release
+    
+    - name: Test build artifacts
+      run: |
+        ls -la build/
+        test -f build/physics || (echo "Binary not found!" && exit 1)
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: physics-linux
+        path: build/physics
+        if-no-files-found: error
