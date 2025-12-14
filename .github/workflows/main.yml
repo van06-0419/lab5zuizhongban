@@ -1,4 +1,4 @@
-name: Build Physics Simulator
+name: Build Physics Simulator | 构建物理模拟器 | Сборка физического симулятора
 
 on:
   push:
@@ -8,25 +8,26 @@ on:
 
 jobs:
   build-windows:
-    name: Build on Windows
+    name: Build on Windows | Windows 构建 | Сборка под Windows
     runs-on: windows-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout code | 拉取代码 | Получение кода
       uses: actions/checkout@v4
     
-    - name: Configure CMake
+    - name: Configure CMake | 配置 CMake | Конфигурация CMake
       run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
     
-    - name: Build
+    - name: Build project | 编译项目 | Сборка проекта
       run: cmake --build build --config Release
     
-    - name: Test build artifacts
+    - name: Test build artifacts | 检查构建结果 | Проверка результата сборки
+      shell: cmd
       run: |
         dir build\Release\
         if not exist build\Release\physics.exe (echo Binary not found! && exit 1)
     
-    - name: Upload artifacts
+    - name: Upload artifacts | 上传构建产物 | Загрузка артефактов
       uses: actions/upload-artifact@v4
       with:
         name: physics-windows
@@ -34,30 +35,30 @@ jobs:
         if-no-files-found: error
 
   build-linux:
-    name: Build on Linux
+    name: Build on Linux | Linux 构建 | Сборка под Linux
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout code | 拉取代码 | Получение кода
       uses: actions/checkout@v4
     
-    - name: Install dependencies
+    - name: Install dependencies | 安装依赖 | Установка зависимостей
       run: |
         sudo apt-get update
         sudo apt-get install -y libsfml-dev
     
-    - name: Configure CMake
+    - name: Configure CMake | 配置 CMake | Конфигурация CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
     
-    - name: Build
+    - name: Build project | 编译项目 | Сборка проекта
       run: cmake --build build --config Release
     
-    - name: Test build artifacts
+    - name: Test build artifacts | 检查构建结果 | Проверка результата сборки
       run: |
         ls -la build/
         test -f build/physics || (echo "Binary not found!" && exit 1)
     
-    - name: Upload artifacts
+    - name: Upload artifacts | 上传构建产物 | Загрузка артефактов
       uses: actions/upload-artifact@v4
       with:
         name: physics-linux
